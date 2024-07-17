@@ -1,4 +1,4 @@
-import { getCurrentUser, formatPaidDate } from "./currentUser.js";
+import { getCurrentUser, formatDate } from "./currentUser.js";
 
 const INVOICES_URL = 'https://bever-aca-assignment.azurewebsites.net/invoices'
 const INVOICES_LINES_URL = 'https://bever-aca-assignment.azurewebsites.net/invoicelines'
@@ -9,14 +9,17 @@ const logoutMenu = document.getElementById('logoutMenu');
 const logoutLink = document.getElementById('logout');
 const currentUser = getCurrentUser();
 
+const invoices = await getData(INVOICES_URL);
+const userInvoices = invoices.filter(invoice => invoice.UserId === currentUser.UserId);
 
-document.addEventListener('DOMContentLoaded', async () => {
-  logoutLink.addEventListener('click', () => {
-    sessionStorage.removeItem('loggedIn')
-    location.href = 'index.html'
-    alert('You have logged out')
-  });
+const invoicesLines = await getData(INVOICES_LINES_URL);
+const products = await getData(PRODUCTS_URL);
 
+logoutRender();
+renderInvoicesTable();
+onInvoiceBtnClick();
+
+function logoutRender() {
   avatar.addEventListener('click', () => {
     logoutMenu.style.display = logoutMenu.style.display === 'block' ? 'none' : 'block';
   });
@@ -27,8 +30,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  logoutLink.addEventListener('click', () => {
+    sessionStorage.removeItem('loggedIn')
+    location.href = 'index.html'
+    alert('You have logged out')
+  });
+
   document.querySelector('.user-menu span').textContent = currentUser.Name
-})
+}
 
 async function getData(url) {
   try {
@@ -40,38 +49,33 @@ async function getData(url) {
   }
 }
 
-const invoices = await getData(INVOICES_URL)
-const userInvoices = invoices.filter(invoice => invoice.UserId === currentUser.UserId)
+function renderInvoicesTable() {
+  userInvoices.forEach(invoice => {
+    let row = document.createElement('tr')
+    document.querySelector('table tbody').append(row)
 
-userInvoices.forEach(invoice => {
-  let row = document.createElement('tr')
-  document.querySelector('table tbody').append(row)
+    let tdRadio = document.createElement('td')
+    row.append(tdRadio)
 
-  let tdRadio = document.createElement('td')
-  row.append(tdRadio)
+    let radio = document.createElement('input')
+    radio.type = 'radio'
+    radio.name = 'invoice'
+    radio.id = invoice.InvoiceId
+    tdRadio.append(radio)
 
-  let radio = document.createElement('input')
-  radio.type = 'radio'
-  radio.name = 'invoice'
-  radio.id = invoice.InvoiceId
-  tdRadio.append(radio)
+    let tdName = document.createElement('td')
+    tdName.textContent = invoice.Name
+    row.append(tdName)
 
-  let tdName = document.createElement('td')
-  tdName.textContent = invoice.Name
-  row.append(tdName)
+    let tdDate = document.createElement('td')
+    tdDate.textContent = formatDate(invoice.PaidDate)
+    row.append(tdDate)
 
-  let tdDate = document.createElement('td')
-  tdDate.textContent = formatPaidDate(invoice.PaidDate)
-  row.append(tdDate)
-
-  let tdTotalAmount = document.createElement('td')
-  tdTotalAmount.textContent = '-'
-  row.append(tdTotalAmount)
-})
-
-const invoicesLines = await getData(INVOICES_LINES_URL)
-
-const products = await getData(PRODUCTS_URL)
+    let tdTotalAmount = document.createElement('td')
+    tdTotalAmount.textContent = getInvoiceTotalAmout(invoice.InvoiceId);
+    row.append(tdTotalAmount)
+  })
+}
 
 function getCurrentInvoiceLines(id) {
   const currentLines = invoicesLines.filter(line => line.InvoiceId === id)
@@ -87,7 +91,6 @@ function getCurrentInvoiceLines(id) {
 function renderInvoicesLines(lines) {
   const tableBody = document.querySelector('.invoices-lines tbody');
   tableBody.innerHTML = '';
-  let totalAmount = 0
 
   lines.forEach(line => {
     let row = document.createElement('tr')
@@ -106,24 +109,27 @@ function renderInvoicesLines(lines) {
     row.append(tdQuantity)
 
     let tdTotalAmount = document.createElement('td')
-    const total = line.productPrice * line.Quantity
-    totalAmount += total
-    tdTotalAmount.textContent = total
+    tdTotalAmount.textContent = line.productPrice * line.Quantity
     row.append(tdTotalAmount)
   })
-
-  return totalAmount
 }
 
-// function getInvoiceTotal(e) {
-//   e.target.closest('tr').lastChild.textContent
-// }
+function getInvoiceTotalAmout(id) {
+  const currentLines = invoicesLines.filter(line => line.InvoiceId === id)
 
-const invoicesRadioBtn = document.querySelectorAll('.invoices input')
-invoicesRadioBtn.forEach(radioBtn => {
-  radioBtn.addEventListener('click', (e) => {
-    const lines = getCurrentInvoiceLines(radioBtn.id)
-    const totalAmount = renderInvoicesLines(lines)
-    e.target.closest('tr').lastChild.textContent = totalAmount
+  return currentLines.reduce((acc, line) => {
+    const product = products.find(item => line.ProductId === item.ProductId)
+    return acc += product.Price * line.Quantity
+  }, 0);
+}
+
+function onInvoiceBtnClick() {
+  const invoicesRadioBtn = document.querySelectorAll('.invoices input');
+
+  invoicesRadioBtn.forEach(radioBtn => {
+    radioBtn.addEventListener('click', (e) => {
+      const lines = getCurrentInvoiceLines(radioBtn.id)
+      renderInvoicesLines(lines)
+    })
   })
-})
+}

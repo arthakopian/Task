@@ -8,6 +8,7 @@ async function userExists(name, password) {
     const response = await fetch(USERS_URL)
     const data = await response.json()
     const users = data.value
+
     return users.find(user => user.Name === name && user.Password === password)
   } catch (error) {
     alert(error)
@@ -20,17 +21,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const name = form.username.value
     const password = form.userpass.value
     const user = await userExists(name, password)
+
     if (user) {
       setCurrentUser(user)
-      console.log(user);
       sessionStorage.setItem('loggedIn', 'true')
       location.href = 'invoices.html'
-
     } else {
-      alert('es xe sti terav')
+      alert('User is not exist')
     }
   })
-
 })
 
 

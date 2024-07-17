@@ -15,7 +15,7 @@ export function getCurrentUser() {
   return currentUser
 }
 
-export function formatPaidDate(isoDate) {
+export function formatDate(isoDate) {
   const date = new Date(isoDate);
   const day = date.getDate();
   const month = date.getMonth() + 1;
