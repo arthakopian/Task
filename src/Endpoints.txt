@@ -1,0 +1,13 @@
+Users
+https://bever-aca-assignment.azurewebsites.net/users
+
+Products
+https://bever-aca-assignment.azurewebsites.net/products
+
+Invoices
+https://bever-aca-assignment.azurewebsites.net/invoices
+
+InvoiceLines
+https://bever-aca-assignment.azurewebsites.net/invoicelines
+
+

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoices</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="./js/utility2.js"></script>
+  <script type="module" src="./js/invoices.js"></script>
+
+</head>
+
+<body>
+  <div class="header">
+    <div class="user-menu">
+      <span></span>
+      <img src="./img/klipartz.com.png" alt="User Avatar" class="user-avatar" id="avatar">
+      <div class="logout-menu" id="logoutMenu">
+        <a href="#" id="logout">Logout</a>
+      </div>
+    </div>
+  </div>
+  <div class="container flex">
+    <div class="page ">
+      <div class="invoices">
+        <h2>Invoices</h2>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Invoice Name</th>
+              <th>Paid Date</th>
+              <th>Total Amount</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="invoices-lines">
+        <h2>Invoice Lines</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price Per Unit</th>
+              <th>Quantity</th>
+              <th>Total Amount</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
